@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank App - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-image: url('static/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+        }
+    
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        h2, h3 {
+            color: #333;
+        }
+    
+        .table th, .table td {
+            text-align: center;
+        }
+    
+        .btn-sm {
+            font-size: 0.85rem;
+            padding: 6px 16px;
+            transition: all 0.2s ease; 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+        }
+    
+        .btn-sm:hover {
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            filter: brightness(1.1);
+        }
+    
+      
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px; 
+            flex-wrap: wrap; 
+        }
+    
+        .btn {
+            width: auto;
+        }
+    
+        .logout-btn {
+            width: 30%;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            padding: 8px 20px;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                width: 80%;
+            }
+    
+            .btn-group {
+                gap: 6px; 
+                flex-direction: row; 
+            }
+    
+            .btn-sm {
+                font-size: 0.75rem; 
+                padding: 5px 12px;
+            }
+    
+            .table th, .table td {
+                font-size: 12px;
+            }
+    
+            .modal-dialog {
+                max-width: 90%;
+            }
+        }
+    
+        @media (max-width: 480px) {
+            h2 {
+                font-size: 20px;
+            }
+    
+            .btn-group {
+                flex-direction: column;
+                gap: 10px; 
+            }
+    
+            .btn-sm {
+                width: 100%; 
+                font-size: 0.7rem; 
+                padding: 8px 10px; 
+            }
+    
+            .table th, .table td {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h2>Welcome, {{ user['name'] }}!</h2>
+        <p><strong>Email:</strong> {{ user['email'] }}</p>
+        <p><strong>Age:</strong> {{ user['age'] }} | <strong>Occupation:</strong> {{ user['occupation'] }}</p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Account Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                    <tr>
+                        <td>{{ account.account_number }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Your Accounts</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Account Type</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in accounts %}
+                <tr>
+                    <td>{{ account['account_type'] }}</td>
+                    <td>₹{{ account['balance'] }}</td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#withdrawModal{{ account['account_id'] }}">Withdraw</button>
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#depositModal{{ account['account_id'] }}">Deposit</button>
+                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#transferModal{{ account['account_id'] }}">Transfer</button>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Withdraw Modal -->
+                <div class="modal fade" id="withdrawModal{{ account['account_id'] }}" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="withdrawModalLabel">Withdraw Funds</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/transaction" method="POST">
+                                    <input type="hidden" name="account_id" value="{{ account['account_id'] }}">
+                                    <input type="hidden" name="action" value="withdrawal">
+                                    <div class="mb-3">
+                                        <label for="amount" class="form-label">Amount to Withdraw</label>
+                                        <input type="number" class="form-control" name="amount" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning btn-sm">Withdraw</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deposit Modal -->
+                <div class="modal fade" id="depositModal{{ account['account_id'] }}" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="depositModalLabel">Deposit Funds</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/transaction" method="POST">
+                                    <input type="hidden" name="account_id" value="{{ account['account_id'] }}">
+                                    <input type="hidden" name="action" value="deposit">
+                                    <div class="mb-3">
+                                        <label for="amount" class="form-label">Amount to Deposit</label>
+                                        <input type="number" class="form-control" name="amount" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-sm">Deposit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transfer Modal -->
+                <div class="modal fade" id="transferModal{{ account['account_id'] }}" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="transferModalLabel">Transfer Funds</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/transaction" method="POST">
+                                    <input type="hidden" name="account_id" value="{{ account['account_id'] }}">
+                                    <input type="hidden" name="action" value="transfer">
+                                    <div class="mb-3">
+                                        <label for="amount" class="form-label">Amount to Transfer</label>
+                                        <input type="number" class="form-control" name="amount" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="to_account_id" class="form-label">Transfer To Account ID</label>
+                                        <input type="text" name="to_account_number" placeholder="Recipient's account number" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-info btn-sm">Transfer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="/all_users" class="btn btn-primary mb-3">
+            <i class="fas fa-users me-1"></i> View All Users
+        </a>
+        
+
+        <h3>Your Transactions</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>From Account</th>
+                    <th>To Account</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction['from_account'] }}</td>
+                    <td>{{ transaction['to_account'] }}</td>
+                    <td>${{ transaction['amount'] }}</td>
+                    <td>{{ transaction['transaction_type'] }}</td>
+                    <td>{{ transaction['date'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>  
+        
+        <div class="text-center mt-4">
+            <a href="/all-transactions" class="btn btn-secondary rounded">View All Transactions</a>
+        </div>  
+        
+        <a href="/logout" class="btn btn-danger logout-btn">Logout</a>
+    </div>
+</body>
+
+<style>
+    .flash-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+  
+    .flash-message {
+      width: 100%;
+      max-width: 500px; 
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin: 0 auto;
+    }
+  </style>
+  
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-wrapper">
+        <div class="w-100">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show flash-message mx-auto" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endwith %}
+  
+</html>
+
+
