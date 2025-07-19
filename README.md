@@ -1,6 +1,6 @@
-# BankQL 💳
+# BankX 💳
 
-**BankQL** is a full-stack banking simulation web application built using **Python**, **Flask**, **MySQL**, and **Power BI**. It enables core banking operations such as user registration, account creation, deposits, withdrawals, transfers, and real-time data analytics.
+**BankX** is a full-stack banking simulation web application built using **Python**, **Flask**, **MySQL**, and **Power BI**. It enables core banking operations such as user registration, account creation, deposits, withdrawals, transfers, and real-time data analytics.
 
 ---
 
