@@ -44,5 +44,6 @@ python app.py
 ``` 
 
 # Demo Video
-https://github.com/user-attachments/assets/ea10498b-17db-43c4-98ad-fde92a1d0b1e
+https://github.com/user-attachments/assets/d90c2b52-5442-490c-9485-4f801587897d
+
 
